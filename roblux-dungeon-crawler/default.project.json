@@ -1,0 +1,29 @@
+{
+  "name": "dungeon-crawler",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "DungeonManager":  { "$path": "src/server/DungeonManager.server.lua" },
+      "EnemyManager":    { "$path": "src/server/EnemyManager.server.lua" },
+      "PlayerData":      { "$path": "src/server/PlayerData.server.lua" }
+    },
+
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "HubController":     { "$path": "src/client/HubController.client.lua" },
+        "DungeonUI":         { "$path": "src/client/DungeonUI.client.lua" }
+      }
+    },
+
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Config":      { "$path": "src/shared/Config.lua" },
+      "EnemyData":   { "$path": "src/shared/EnemyData.lua" },
+      "DungeonData": { "$path": "src/shared/DungeonData.lua" }
+    }
+  }
+}
