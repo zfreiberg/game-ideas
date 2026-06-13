@@ -5,17 +5,19 @@
 
     "ServerScriptService": {
       "$className": "ServerScriptService",
-      "DungeonManager":  { "$path": "src/server/DungeonManager.server.lua" },
-      "EnemyManager":    { "$path": "src/server/EnemyManager.server.lua" },
-      "PlayerData":      { "$path": "src/server/PlayerData.server.lua" }
+      "WorldBuilder":     { "$path": "src/server/WorldBuilder.server.lua" },
+      "DungeonManager":   { "$path": "src/server/DungeonManager.server.lua" },
+      "EnemyManager":     { "$path": "src/server/EnemyManager.server.lua" },
+      "PlayerData":       { "$path": "src/server/PlayerData.server.lua" },
+      "PlayerDataModule": { "$path": "src/server/PlayerDataModule.lua" }
     },
 
     "StarterPlayer": {
       "$className": "StarterPlayer",
       "StarterPlayerScripts": {
         "$className": "StarterPlayerScripts",
-        "HubController":     { "$path": "src/client/HubController.client.lua" },
-        "DungeonUI":         { "$path": "src/client/DungeonUI.client.lua" }
+        "HubController": { "$path": "src/client/HubController.client.lua" },
+        "DungeonUI":     { "$path": "src/client/DungeonUI.client.lua" }
       }
     },
 
@@ -23,7 +25,13 @@
       "$className": "ReplicatedStorage",
       "Config":      { "$path": "src/shared/Config.lua" },
       "EnemyData":   { "$path": "src/shared/EnemyData.lua" },
-      "DungeonData": { "$path": "src/shared/DungeonData.lua" }
+      "DungeonData": { "$path": "src/shared/DungeonData.lua" },
+      "RemoteEvents": {
+        "$className": "Folder",
+        "DungeonComplete": { "$className": "RemoteEvent" },
+        "EXPGained":       { "$className": "RemoteEvent" },
+        "ReturnToHub":     { "$className": "RemoteEvent" }
+      }
     }
   }
 }

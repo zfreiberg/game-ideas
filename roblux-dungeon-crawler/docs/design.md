@@ -18,7 +18,7 @@ Fleshed-out designs for features that are ready to build. Items here have been t
 - Walking up to a door and clicking (or touching a prompt) teleports player into that dungeon
 - Locked doors show a tooltip explaining what's needed to unlock
 
-**Status:** 🔲 Not started
+**Status:** ✅ Implemented (Phase 1)
 
 ---
 
@@ -41,7 +41,7 @@ Fleshed-out designs for features that are ready to build. Items here have been t
 - A `ScreenGui` popup appears: "Dungeon Complete!"
 - Button: "Return to Hub" — teleports player back to hub world
 
-**Status:** 🔲 Not started
+**Status:** ✅ Implemented (Phase 1)
 
 ---
 

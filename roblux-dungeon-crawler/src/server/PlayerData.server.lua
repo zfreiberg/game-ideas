@@ -1,22 +1,19 @@
--- Tracks per-player stats: level, exp, gear score
+-- Thin wrapper: wires PlayerAdded/Removing to the shared PlayerDataModule singleton
 local Players = game:GetService("Players")
+local PlayerDataModule = require(script.Parent.PlayerDataModule)
 
-local playerData = {}
-
-local function onPlayerAdded(player)
-	playerData[player.UserId] = {
-		level   = 1,
-		exp     = 0,
-		expToNext = 100,
-	}
+Players.PlayerAdded:Connect(function(player)
+	PlayerDataModule.init(player)
 	print("[PlayerData] Initialized data for", player.Name)
-end
+end)
 
-local function onPlayerRemoving(player)
-	playerData[player.UserId] = nil
-end
+Players.PlayerRemoving:Connect(function(player)
+	PlayerDataModule.cleanup(player)
+end)
 
-Players.PlayerAdded:Connect(onPlayerAdded)
-Players.PlayerRemoving:Connect(onPlayerRemoving)
+-- Handle players who joined before this script loaded (Studio play-solo edge case)
+for _, player in ipairs(Players:GetPlayers()) do
+	PlayerDataModule.init(player)
+end
 
 print("[PlayerData] Loaded")
