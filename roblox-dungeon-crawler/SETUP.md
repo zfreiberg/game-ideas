@@ -52,7 +52,7 @@ If you see a version number, Aftman is installed.
 
 ```powershell
 git clone https://github.com/zfreiberg/game-ideas.git
-cd game-ideas\roblux-dungeon-crawler
+cd game-ideas\roblox-dungeon-crawler
 ```
 
 > If you don't have Git installed, download it from [git-scm.com](https://git-scm.com) first.
@@ -61,7 +61,7 @@ cd game-ideas\roblux-dungeon-crawler
 
 ## Step 4 — Install Rojo (via Aftman)
 
-From inside the `roblux-dungeon-crawler` folder:
+From inside the `roblox-dungeon-crawler` folder:
 
 ```powershell
 aftman install
@@ -111,14 +111,14 @@ This creates `dungeon-crawler.rbxl` in the project folder. (It's gitignored — 
 
 1. Open Roblox Studio
 2. Click **File → Open from File...**
-3. Navigate to `game-ideas\roblux-dungeon-crawler\`
+3. Navigate to `game-ideas\roblox-dungeon-crawler\`
 4. Select `dungeon-crawler.rbxl` and open it
 
 ---
 
 ## Step 8 — Start Rojo and Connect
 
-**In PowerShell** (from the `roblux-dungeon-crawler` folder):
+**In PowerShell** (from the `roblox-dungeon-crawler` folder):
 
 ```powershell
 rojo serve
@@ -149,7 +149,7 @@ Hit **F5** (or the Play button) in Studio. You should see:
 Every time you want to work on the game:
 
 ```powershell
-cd game-ideas\roblux-dungeon-crawler
+cd game-ideas\roblox-dungeon-crawler
 rojo serve
 ```
 
@@ -165,7 +165,7 @@ For a better coding experience:
 2. Install these extensions:
    - **Rojo** by Roblox
    - **Luau LSP** by JohnnyMorganz (autocomplete, type checking for Luau)
-3. Open the `roblux-dungeon-crawler` folder in VS Code
+3. Open the `roblox-dungeon-crawler` folder in VS Code
 
 ---
 

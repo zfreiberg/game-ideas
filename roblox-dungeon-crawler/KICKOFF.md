@@ -15,7 +15,7 @@ Welcome back! Here's where we are and exactly what to do next.
 
 ### Step 1 — Install Rojo CLI
 Download the standalone binary from https://rojo.space/docs/installation/
-Drop `rojo.exe` into this project folder (`roblux-dungeon-crawler/`), or add it to your PATH.
+Drop `rojo.exe` into this project folder (`roblox-dungeon-crawler/`), or add it to your PATH.
 
 ### Step 2 — Install VS Code Extensions
 - **Rojo** (by Roblox)
@@ -26,7 +26,7 @@ Download from https://rojo.space and install into Roblox Studio.
 
 ### Step 4 — Open Claude Code in the new location
 ```
-Z:\gamedev\game-ideas\roblux-dungeon-crawler
+Z:\gamedev\game-ideas\roblox-dungeon-crawler
 ```
 
 ---
