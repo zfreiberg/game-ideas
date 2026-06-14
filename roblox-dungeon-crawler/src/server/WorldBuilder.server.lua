@@ -178,21 +178,61 @@ for _, dd in ipairs(doorData) do
 	-- DungeonManager enforces the level gate server-side; all 4 have prompts
 end
 
--- ── Zone 1 dungeon room (shared for Phase 1 — at Z = 1000) ───────────────────
+-- ── Zone 1 — The Ashen Forest dungeon room (at Z = 1000) ────────────────────
 
 local D1_CENTER = Vector3.new(0, 0, 1000)
 
--- Floor
+-- Grass floor
 local d1Floor = Instance.new("Part")
-d1Floor.Name     = "Dungeon1Floor"
-d1Floor.Size     = Vector3.new(120, 4, 120)
-d1Floor.Position = D1_CENTER + Vector3.new(0, -2, 0)
-d1Floor.Anchored = true
-d1Floor.Material = Enum.Material.SmoothPlastic
-d1Floor.BrickColor = BrickColor.new("Dark grey")
-d1Floor.Parent   = Workspace
+d1Floor.Name       = "Dungeon1Floor"
+d1Floor.Size       = Vector3.new(120, 4, 120)
+d1Floor.Position   = D1_CENTER + Vector3.new(0, -2, 0)
+d1Floor.Anchored   = true
+d1Floor.Material   = Enum.Material.Grass
+d1Floor.BrickColor = BrickColor.new("Medium green")
+d1Floor.Parent     = Workspace
 
--- Walls
+-- Grass border strip around inside edge of floor
+local borderParts = {
+	{ Vector3.new(0, 0.5, -52),  Vector3.new(120, 1, 14) },  -- N strip
+	{ Vector3.new(0, 0.5,  52),  Vector3.new(120, 1, 14) },  -- S strip
+	{ Vector3.new(-52, 0.5, 0),  Vector3.new(14, 1, 92)  },  -- W strip
+	{ Vector3.new( 52, 0.5, 0),  Vector3.new(14, 1, 92)  },  -- E strip
+}
+for i, b in ipairs(borderParts) do
+	local bp = makePart("D1Border_" .. i, b[2], D1_CENTER + b[1], "Dark green")
+	bp.Material = Enum.Material.Grass
+end
+
+-- Treeline inside the border (dense, against walls)
+math.randomseed(7)
+local treeRing = {
+	-- North row
+	{ z = -48, xMin = -54, xMax = 54 },
+	-- South row
+	{ z =  48, xMin = -54, xMax = 54 },
+}
+for _, row in ipairs(treeRing) do
+	local x = row.xMin
+	while x <= row.xMax do
+		local jx = x + math.random(-3, 3)
+		local jz = row.z + math.random(-4, 4)
+		makeTree(D1_CENTER.X + jx, D1_CENTER.Z + jz, math.random(8, 14), math.random(5, 8))
+		x = x + math.random(10, 16)
+	end
+end
+-- East and West columns
+for _, col in ipairs({ -48, 48 }) do
+	local z = -36
+	while z <= 36 do
+		local jz = z + math.random(-3, 3)
+		local jx = col + math.random(-3, 3)
+		makeTree(D1_CENTER.X + jx, D1_CENTER.Z + jz, math.random(8, 14), math.random(5, 8))
+		z = z + math.random(10, 16)
+	end
+end
+
+-- Dungeon walls (mossy stone)
 local walls = {
 	{ Vector3.new(0, 14, -62),  Vector3.new(124, 32, 4) },   -- N
 	{ Vector3.new(0, 14, 62),   Vector3.new(124, 32, 4) },   -- S
@@ -204,24 +244,24 @@ for _, w in ipairs(walls) do
 	wall.Size      = w[2]
 	wall.Position  = D1_CENTER + w[1]
 	wall.Anchored  = true
-	wall.Material  = Enum.Material.SmoothPlastic
-	wall.BrickColor = BrickColor.new("Dark stone grey")
+	wall.Material  = Enum.Material.LeafyGrass
+	wall.BrickColor = BrickColor.new("Dark green")
 	wall.Parent    = Workspace
 end
 
 -- Entry sign (south wall)
 local entranceSign = makePart("EntranceSign", Vector3.new(30, 6, 1),
-	D1_CENTER + Vector3.new(0, 18, 61), "Bright green")
+	D1_CENTER + Vector3.new(0, 18, 61), "Dark green")
 local signGui = Instance.new("SurfaceGui")
 signGui.Face  = Enum.NormalId.Front
 signGui.Parent = entranceSign
 local signLbl = Instance.new("TextLabel")
-signLbl.Size   = UDim2.new(1, 0, 1, 0)
+signLbl.Size              = UDim2.new(1, 0, 1, 0)
 signLbl.BackgroundTransparency = 1
-signLbl.Text   = "ZONE 1 — THE BLIGHTED REACHES"
-signLbl.TextColor3 = Color3.new(1, 1, 1)
-signLbl.TextScaled = true
-signLbl.Font   = Enum.Font.GothamBold
-signLbl.Parent = signGui
+signLbl.Text              = "THE ASHEN FOREST"
+signLbl.TextColor3        = Color3.fromRGB(180, 255, 140)
+signLbl.TextScaled        = true
+signLbl.Font              = Enum.Font.GothamBold
+signLbl.Parent            = signGui
 
 print("[WorldBuilder] Hub and dungeon room built")

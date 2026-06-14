@@ -34,9 +34,13 @@ local function rollMutation()
 	return weightedPick(LootData.Mutations, "chance")
 end
 
-local function rollItemType()
-	local types = LootData.ItemTypes.Zone1
-	return types[math.random(1, #types)]
+local DungeonData = require(ReplicatedStorage.DungeonData)
+
+local function rollItemType(dungeonId)
+	local dungeon = DungeonData.Dungeons[dungeonId]
+	local pool = dungeon and dungeon.lootPool and LootData.ItemTypes[dungeon.lootPool]
+	if not pool then pool = LootData.ItemTypes.Zone1 end
+	return pool[math.random(1, #pool)]
 end
 
 -- Returns an item table, or nil if no drop
@@ -47,7 +51,7 @@ function LootManager.rollForEnemy(dungeonId, dungeonMutation, isBoss)
 	local tierBonus = Config.LOOT_TIER_BONUS[dungeonMutation] or 0
 	local rarity    = rollRarity(tierBonus)
 	local mutation  = rollMutation()
-	local itemType  = rollItemType()
+	local itemType  = rollItemType(dungeonId)
 
 	return {
 		name     = itemType,
