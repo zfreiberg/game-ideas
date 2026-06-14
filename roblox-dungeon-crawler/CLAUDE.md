@@ -95,10 +95,41 @@ aftman.toml                     — toolchain: rojo-rbx/rojo@7.7.0-rc.1
 - Zone 1 level cap: 15 (players should reach Zone 2 within 3–4 sessions)
 
 ## Development Workflow
-1. Discuss feature ideas → log in `docs/ideas.md`
-2. Flesh out design → move to `docs/design.md`
-3. Implement (check `/docs` first — source of truth)
-4. Update `docs/changelog.md` with what shipped
+
+All features must be developed on a feature branch and merged into `main` via a pull request. Never commit directly to `main`.
+
+### Branch naming
+```
+feat/<short-description>     # new feature
+fix/<short-description>      # bug fix
+chore/<short-description>    # tooling, docs, cleanup
+```
+
+### Per-feature flow
+```powershell
+git checkout main
+git pull
+git checkout -b feat/my-feature
+
+# ... make changes ...
+
+git add <files>
+git commit -m "feat: short description of what and why"
+git push -u origin feat/my-feature
+gh pr create --title "feat: my feature" --body "What changed and why."
+```
+
+### PR rules
+- One feature per PR — keep diffs small and reviewable
+- Always pull latest `main` before branching
+- Update `docs/changelog.md` in the same PR as the feature
+- Squash-merge into `main` when approved
+
+### Idea → shipped checklist
+1. Log idea in `docs/ideas.md`
+2. Flesh out design in `docs/design.md`
+3. Create feature branch → implement (check `/docs` first — source of truth)
+4. Open PR → merge → update `docs/changelog.md`
 
 ## Key Design Pillars
 1. Simple, satisfying loop: run dungeon → get loot → extract → repeat
