@@ -37,7 +37,24 @@ end
 
 -- ── Hub baseplate ─────────────────────────────────────────────────────────────
 
-makePart("HubBaseplate", Vector3.new(240, 4, 240), Vector3.new(0, -2, 0), "Medium stone grey")
+-- Grass baseplate
+local baseplate = makePart("HubBaseplate", Vector3.new(240, 4, 240), Vector3.new(0, -2, 0), "Bright green")
+baseplate.Material = Enum.Material.Grass
+
+-- Dirt path from spawn to dungeon doors
+makePart("HubPath", Vector3.new(20, 1, 100), Vector3.new(0, 0.5, -5), "Reddish brown").Material = Enum.Material.Ground
+
+-- Grass detail patches (visual variety)
+local patches = {
+	{ Vector3.new(-90, 0.5, -20), Vector3.new(40, 1, 30) },
+	{ Vector3.new(90,  0.5, -20), Vector3.new(40, 1, 30) },
+	{ Vector3.new(-90, 0.5,  60), Vector3.new(40, 1, 40) },
+	{ Vector3.new(90,  0.5,  60), Vector3.new(40, 1, 40) },
+}
+for i, p in ipairs(patches) do
+	local patch = makePart("GrassPatch_" .. i, p[2], p[1], "Medium green")
+	patch.Material = Enum.Material.Grass
+end
 
 -- Spawn pad
 local spawn = Instance.new("SpawnLocation")
