@@ -185,7 +185,8 @@ local function spawnEnemies(player, dungeonId, mutation)
 	local damage = Config.DAMAGE[pd and pd.class or "Default"] or Config.DAMAGE.Default
 
 	local center = Vector3.new(0, typeData.size.Y / 2 + 2, 1000)
-	local goldPerEnemy = math.floor((dungeon.goldMin + dungeon.goldMax) / 2 * goldMult / count)
+	local goldPerEnemy = dungeon.goldPerEnemy
+		or math.floor((dungeon.goldMin + dungeon.goldMax) / 2 * goldMult / count)
 
 	for i = 1, count do
 		local maxHP = math.floor(typeData.health * hpMult)
@@ -193,6 +194,7 @@ local function spawnEnemies(player, dungeonId, mutation)
 		local cube = Instance.new("Part")
 		cube.Name        = "Enemy_" .. player.UserId .. "_" .. i
 		cube.Size        = typeData.size
+		cube.Shape       = typeData.partShape or Enum.PartType.Block
 		cube.Color       = enemyColor
 		cube.Material    = Enum.Material.SmoothPlastic
 		cube.Anchored    = true

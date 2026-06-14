@@ -30,6 +30,10 @@ LootData.ItemTypes = {
 		"Leather Hood", "Mining Pick", "Crypt Staff",
 		"Rusted Axe", "Stone Shield",
 	},
+	-- Dungeon 1 drops crude weapons to funnel players to the Blacksmith for upgrades
+	Dungeon1 = {
+		"Crude Iron Axe", "Crude Iron Sword",
+	},
 }
 
 -- Per-enemy drop chance (%) — bosses always drop
