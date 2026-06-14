@@ -35,6 +35,55 @@ local function makeLabel(parent, text, textColor, size, pos, font)
 	return lbl
 end
 
+-- ── Forest helpers ───────────────────────────────────────────────────────────
+
+local function makeTree(x, z, trunkH, canopyR)
+	trunkH  = trunkH  or (math.random(10, 18))
+	canopyR = canopyR or (math.random(7,  12))
+
+	local trunk = Instance.new("Part")
+	trunk.Name      = "TreeTrunk"
+	trunk.Size      = Vector3.new(2.5, trunkH, 2.5)
+	trunk.Position  = Vector3.new(x, trunkH / 2, z)
+	trunk.Anchored  = true
+	trunk.Material  = Enum.Material.Wood
+	trunk.BrickColor = BrickColor.new("Reddish brown")
+	trunk.CanCollide = true
+	trunk.Parent    = Workspace
+
+	local canopy = Instance.new("Part")
+	canopy.Name      = "TreeCanopy"
+	canopy.Shape     = Enum.PartType.Ball
+	canopy.Size      = Vector3.new(canopyR * 2, canopyR * 2, canopyR * 2)
+	canopy.Position  = Vector3.new(x, trunkH + canopyR * 0.6, z)
+	canopy.Anchored  = true
+	canopy.Material  = Enum.Material.Grass
+	canopy.BrickColor = BrickColor.new(math.random() < 0.3 and "Dark green" or "Bright green")
+	canopy.CanCollide = false
+	canopy.CastShadow = true
+	canopy.Parent    = Workspace
+end
+
+-- Place a dense tree line along one edge (axis = "x" or "z", sign = 1 or -1)
+local function forestEdge(axis, edgeVal, minA, maxA, spacing)
+	spacing = spacing or 14
+	local a = minA
+	while a <= maxA do
+		local jitter = math.random(-4, 4)
+		local depth  = math.random(0, 16)  -- how far inward the tree is pushed
+		local x, z
+		if axis == "z" then
+			x = a + jitter
+			z = edgeVal + (edgeVal > 0 and -depth or depth)
+		else
+			x = edgeVal + (edgeVal > 0 and -depth or depth)
+			z = a + jitter
+		end
+		makeTree(x, z)
+		a = a + spacing + math.random(-3, 3)
+	end
+end
+
 -- ── Hub baseplate ─────────────────────────────────────────────────────────────
 
 -- Grass baseplate
@@ -65,6 +114,22 @@ spawn.Anchored  = true
 spawn.BrickColor = BrickColor.new("Bright yellow")
 spawn.Duration  = 0
 spawn.Parent    = Workspace
+
+-- ── Dense perimeter forest ────────────────────────────────────────────────────
+-- Hub baseplate spans ±120 on X and Z. Trees ring the outside edge.
+math.randomseed(42)  -- deterministic layout so it's the same every server start
+
+forestEdge("z",  115, -110, 110, 13)   -- North wall
+forestEdge("z", -115, -110, 110, 13)   -- South wall
+forestEdge("x",  115,  -90,  90, 13)   -- East wall
+forestEdge("x", -115,  -90,  90, 13)   -- West wall
+
+-- Corner clusters (fill the gaps)
+for _, c in ipairs({ {110,110},{-110,110},{110,-110},{-110,-110} }) do
+	for _ = 1, 6 do
+		makeTree(c[1] + math.random(-10, 10), c[2] + math.random(-10, 10))
+	end
+end
 
 -- ── Town Showcase Board (GDD 9.2 — must be impossible to miss) ───────────────
 
