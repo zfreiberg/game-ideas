@@ -1,5 +1,5 @@
 {
-  "name": "dungeon-crawler",
+  "name": "raidbound",
   "tree": {
     "$className": "DataModel",
 
@@ -9,7 +9,8 @@
       "DungeonManager":   { "$path": "src/server/DungeonManager.server.lua" },
       "EnemyManager":     { "$path": "src/server/EnemyManager.server.lua" },
       "PlayerData":       { "$path": "src/server/PlayerData.server.lua" },
-      "PlayerDataModule": { "$path": "src/server/PlayerDataModule.lua" }
+      "PlayerDataModule": { "$path": "src/server/PlayerDataModule.lua" },
+      "LootManager":      { "$path": "src/server/LootManager.lua" }
     },
 
     "StarterPlayer": {
@@ -26,11 +27,20 @@
       "Config":      { "$path": "src/shared/Config.lua" },
       "EnemyData":   { "$path": "src/shared/EnemyData.lua" },
       "DungeonData": { "$path": "src/shared/DungeonData.lua" },
+      "LootData":    { "$path": "src/shared/LootData.lua" },
       "RemoteEvents": {
         "$className": "Folder",
-        "DungeonComplete": { "$className": "RemoteEvent" },
-        "EXPGained":       { "$className": "RemoteEvent" },
-        "ReturnToHub":     { "$className": "RemoteEvent" }
+        "DungeonEntered":       { "$className": "RemoteEvent" },
+        "GoldGained":           { "$className": "RemoteEvent" },
+        "LootDropped":          { "$className": "RemoteEvent" },
+        "ExtractionAvailable":  { "$className": "RemoteEvent" },
+        "ExtractionCountdown":  { "$className": "RemoteEvent" },
+        "ExtractionResult":     { "$className": "RemoteEvent" },
+        "EXPGained":            { "$className": "RemoteEvent" },
+        "PlayerDataSync":       { "$className": "RemoteEvent" },
+        "RequestExtraction":    { "$className": "RemoteEvent" },
+        "ReturnToHub":          { "$className": "RemoteEvent" },
+        "SelectClass":          { "$className": "RemoteEvent" }
       }
     }
   }

@@ -1,12 +1,51 @@
--- Global game constants
+-- Raidbound: global constants (GDD v1.0)
 local Config = {}
 
-Config.HUB_SPAWN = Vector3.new(0, 5, 0)
+Config.HUB_SPAWN_CF = CFrame.new(0, 5, 40)
 
-Config.DUNGEONS = {
-	{ id = 1, name = "Dungeon 1 — Beginner", minLevel = 1,  enemyCount = 5,  expReward = 50  },
-	{ id = 2, name = "Dungeon 2 — Easy",     minLevel = 3,  enemyCount = 10, expReward = 120 },
-	{ id = 3, name = "Dungeon 3 — Medium",   minLevel = 6,  enemyCount = 15, expReward = 250 },
+-- Zone 1 level cap — players should reach Zone 2 within 3-4 sessions
+Config.ZONE_1_LEVEL_CAP = 15
+
+-- Combat damage by class (GDD 5.2)
+Config.DAMAGE = {
+	Warrior = 35,
+	Mage    = 55,
+	Default = 25,
 }
+
+-- Dungeon mutation rates (GDD 4.4) — non-Normal target 35%+
+Config.MUTATION_RATES = {
+	Normal    = 65,
+	Golden    = 15,
+	Corrupted = 12,
+	Treasure  = 8,
+}
+
+-- Gold multiplier per mutation (GDD 4.4)
+Config.GOLD_MULTIPLIERS = {
+	Normal    = 1.0,
+	Golden    = 1.5,  -- +50% gold
+	Corrupted = 0.9,
+	Treasure  = 1.2,
+}
+
+-- Loot tier bonus per mutation — shifts rarity up N steps (GDD 4.4)
+Config.LOOT_TIER_BONUS = {
+	Normal    = 0,
+	Golden    = 0,
+	Corrupted = 1,  -- loot quality +1 tier
+	Treasure  = 0,
+}
+
+-- Enemy HP multiplier per mutation
+Config.ENEMY_HP_MULT = {
+	Normal    = 1.0,
+	Golden    = 1.2,  -- enemy shields (harder to kill)
+	Corrupted = 1.5,  -- enemies stronger
+	Treasure  = 0.6,  -- weaker enemies, no boss
+}
+
+-- Extraction countdown seconds (GDD 7.1)
+Config.EXTRACTION_COUNTDOWN = 10
 
 return Config

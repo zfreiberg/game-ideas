@@ -1,19 +1,32 @@
--- Thin wrapper: wires PlayerAdded/Removing to the shared PlayerDataModule singleton
-local Players = game:GetService("Players")
-local PlayerDataModule = require(script.Parent.PlayerDataModule)
+-- Wires PlayerAdded/Removing to PlayerDataModule; syncs initial data to client
+local Players           = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 
-Players.PlayerAdded:Connect(function(player)
+local PlayerDataModule = require(ServerScriptService.PlayerDataModule)
+local evSync = ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("PlayerDataSync")
+
+local function onPlayerAdded(player)
 	PlayerDataModule.init(player)
-	print("[PlayerData] Initialized data for", player.Name)
-end)
+	print("[PlayerData] Initialized:", player.Name)
 
+	-- Wait for character then sync initial data to client HUD
+	player.CharacterAdded:Connect(function()
+		task.wait(1)  -- let client scripts load
+		local d = PlayerDataModule.get(player)
+		if d then
+			evSync:FireClient(player, { level = d.level, gold = d.gold, class = d.class })
+		end
+	end)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
 Players.PlayerRemoving:Connect(function(player)
 	PlayerDataModule.cleanup(player)
 end)
 
--- Handle players who joined before this script loaded (Studio play-solo edge case)
 for _, player in ipairs(Players:GetPlayers()) do
-	PlayerDataModule.init(player)
+	onPlayerAdded(player)
 end
 
 print("[PlayerData] Loaded")

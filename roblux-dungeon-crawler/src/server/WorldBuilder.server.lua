@@ -1,134 +1,210 @@
--- Procedurally builds the hub world and dungeon rooms so everything is code-driven (no Studio Parts needed)
-local Workspace = game:GetService("Workspace")
+-- Raidbound WorldBuilder: hub + Zone 1 dungeon room (code-driven, no Studio Parts)
+local Workspace   = game:GetService("Workspace")
 local DungeonData = require(game:GetService("ReplicatedStorage").DungeonData)
 
--- Hub baseplate
-local hubPlate = Instance.new("Part")
-hubPlate.Name = "HubBaseplate"
-hubPlate.Size = Vector3.new(200, 4, 200)
-hubPlate.Position = Vector3.new(0, -2, 0)
-hubPlate.Anchored = true
-hubPlate.Material = Enum.Material.SmoothPlastic
-hubPlate.BrickColor = BrickColor.new("Medium stone grey")
-hubPlate.Parent = Workspace
+-- ── Utility ───────────────────────────────────────────────────────────────────
 
--- Spawn location (yellow pad near center)
-local spawnLoc = Instance.new("SpawnLocation")
-spawnLoc.Name = "HubSpawn"
-spawnLoc.Size = Vector3.new(8, 1, 8)
-spawnLoc.Position = Vector3.new(0, 1, 40)
-spawnLoc.Anchored = true
-spawnLoc.BrickColor = BrickColor.new("Bright yellow")
-spawnLoc.Duration = 0
-spawnLoc.Parent = Workspace
-
--- Dungeon doors
-local doorColors = {
-	BrickColor.new("Bright green"),   -- Dungeon 1 (unlocked)
-	BrickColor.new("Dark grey"),      -- Dungeon 2 (locked)
-	BrickColor.new("Dark grey"),      -- Dungeon 3 (locked)
-}
-local doorXPositions = { -40, 0, 40 }
-
-for i = 1, 3 do
-	local dungeon = DungeonData.Dungeons[i]
-	local isOpen = (i == 1)
-
-	local door = Instance.new("Part")
-	door.Name = "DungeonDoor_" .. i
-	door.Size = Vector3.new(10, 12, 2)
-	door.Position = Vector3.new(doorXPositions[i], 6, -20)
-	door.Anchored = true
-	door.Material = Enum.Material.SmoothPlastic
-	door.BrickColor = doorColors[i]
-	door.Parent = Workspace
-
-	-- Name label above door
-	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.new(0, 220, 0, 60)
-	billboard.StudsOffset = Vector3.new(0, 8, 0)
-	billboard.AlwaysOnTop = false
-	billboard.Parent = door
-
-	local nameLabel = Instance.new("TextLabel")
-	nameLabel.Size = UDim2.new(1, 0, 0.6, 0)
-	nameLabel.BackgroundTransparency = 1
-	nameLabel.Text = dungeon and dungeon.name or ("Dungeon " .. i)
-	nameLabel.TextColor3 = Color3.new(1, 1, 1)
-	nameLabel.TextScaled = true
-	nameLabel.Font = Enum.Font.GothamBold
-	nameLabel.Parent = billboard
-
-	local subLabel = Instance.new("TextLabel")
-	subLabel.Size = UDim2.new(1, 0, 0.4, 0)
-	subLabel.Position = UDim2.new(0, 0, 0.6, 0)
-	subLabel.BackgroundTransparency = 1
-	subLabel.Text = isOpen and "Click to Enter" or ("Req. Level " .. (dungeon and dungeon.minLevel or "?"))
-	subLabel.TextColor3 = isOpen and Color3.fromRGB(180, 255, 180) or Color3.fromRGB(180, 180, 180)
-	subLabel.TextScaled = true
-	subLabel.Font = Enum.Font.Gotham
-	subLabel.Parent = billboard
-
-	-- ProximityPrompt (only on door 1 for now)
-	if isOpen then
-		local prompt = Instance.new("ProximityPrompt")
-		prompt.ActionText = "Enter Dungeon"
-		prompt.ObjectText = dungeon and dungeon.name or ("Dungeon " .. i)
-		prompt.HoldDuration = 0
-		prompt.MaxActivationDistance = 12
-		prompt.Parent = door
-	end
+local function makePart(name, size, pos, color, material, anchored)
+	local p = Instance.new("Part")
+	p.Name       = name
+	p.Size       = size
+	p.Position   = pos
+	p.BrickColor = color and BrickColor.new(color) or BrickColor.new("Medium stone grey")
+	p.Material   = material or Enum.Material.SmoothPlastic
+	p.Anchored   = anchored ~= false
+	p.CanCollide = true
+	p.Parent     = Workspace
+	return p
 end
 
--- Dungeon 1 room (1000 studs away so it's isolated from hub)
-local d1Center = Vector3.new(0, 0, 1000)
+local function makeLabel(parent, text, textColor, size, pos, font)
+	local bg = Instance.new("BillboardGui")
+	bg.Size        = size or UDim2.new(0, 240, 0, 60)
+	bg.StudsOffset = pos  or Vector3.new(0, 8, 0)
+	bg.AlwaysOnTop = false
+	bg.Parent      = parent
 
+	local lbl = Instance.new("TextLabel")
+	lbl.Size               = UDim2.new(1, 0, 1, 0)
+	lbl.BackgroundTransparency = 1
+	lbl.Text               = text
+	lbl.TextColor3         = textColor or Color3.new(1, 1, 1)
+	lbl.TextScaled         = true
+	lbl.Font               = font or Enum.Font.GothamBold
+	lbl.Parent             = bg
+	return lbl
+end
+
+-- ── Hub baseplate ─────────────────────────────────────────────────────────────
+
+makePart("HubBaseplate", Vector3.new(240, 4, 240), Vector3.new(0, -2, 0), "Medium stone grey")
+
+-- Spawn pad
+local spawn = Instance.new("SpawnLocation")
+spawn.Name      = "HubSpawn"
+spawn.Size      = Vector3.new(10, 1, 10)
+spawn.Position  = Vector3.new(0, 1, 40)
+spawn.Anchored  = true
+spawn.BrickColor = BrickColor.new("Bright yellow")
+spawn.Duration  = 0
+spawn.Parent    = Workspace
+
+-- ── Town Showcase Board (GDD 9.2 — must be impossible to miss) ───────────────
+
+local showcase = makePart("TownShowcaseBoard", Vector3.new(28, 16, 2),
+	Vector3.new(0, 8, 10), "Bright blue")
+showcase.Material = Enum.Material.SmoothPlastic
+
+local sfaceGui = Instance.new("SurfaceGui")
+sfaceGui.Face  = Enum.NormalId.Front
+sfaceGui.Parent = showcase
+
+local function addShowcaseRow(gui, text, color, yPos)
+	local lbl = Instance.new("TextLabel")
+	lbl.Size           = UDim2.new(1, -10, 0, 24)
+	lbl.Position       = UDim2.new(0, 5, 0, yPos)
+	lbl.BackgroundTransparency = 1
+	lbl.Text           = text
+	lbl.TextColor3     = color or Color3.new(1, 1, 1)
+	lbl.Font           = Enum.Font.GothamBold
+	lbl.TextScaled     = false
+	lbl.TextSize       = 16
+	lbl.TextXAlignment = Enum.TextXAlignment.Left
+	lbl.Parent         = gui
+end
+
+addShowcaseRow(sfaceGui, "TOWN SHOWCASE BOARD", Color3.fromRGB(255, 200, 40), 10)
+addShowcaseRow(sfaceGui, "Recent Mythic Drops", Color3.fromRGB(255, 140, 20), 40)
+addShowcaseRow(sfaceGui, "— (Waiting for first drop...)", Color3.fromRGB(180, 180, 180), 62)
+addShowcaseRow(sfaceGui, "Fastest Clear This Week", Color3.fromRGB(60, 200, 255), 96)
+addShowcaseRow(sfaceGui, "— (No clears yet)", Color3.fromRGB(180, 180, 180), 118)
+addShowcaseRow(sfaceGui, "Top Gold Earner Today", Color3.fromRGB(255, 200, 40), 152)
+addShowcaseRow(sfaceGui, "— (No data yet)", Color3.fromRGB(180, 180, 180), 174)
+
+-- ── Hub NPCs / buildings (visual stubs — GDD 9.1) ────────────────────────────
+
+-- Blacksmith
+local smith = makePart("Blacksmith", Vector3.new(14, 16, 12), Vector3.new(-60, 8, 10), "Dark grey")
+makeLabel(smith, "BLACKSMITH\nGear Upgrades", Color3.fromRGB(255, 160, 40),
+	UDim2.new(0, 200, 0, 60), Vector3.new(0, 12, 0))
+
+-- Trade Bench
+local trade = makePart("TradeBench", Vector3.new(10, 6, 8), Vector3.new(-60, 3, 30), "Reddish brown")
+makeLabel(trade, "TRADE BENCH", Color3.fromRGB(255, 200, 80),
+	UDim2.new(0, 180, 0, 40), Vector3.new(0, 7, 0))
+
+-- Quest Board
+local quest = makePart("QuestBoard", Vector3.new(10, 14, 2), Vector3.new(60, 7, 10), "Bright orange")
+makeLabel(quest, "QUEST BOARD\nDaily Bounties", Color3.fromRGB(255, 200, 80),
+	UDim2.new(0, 200, 0, 60), Vector3.new(0, 10, 0))
+
+-- Storage Vault
+local vault = makePart("StorageVault", Vector3.new(10, 12, 10), Vector3.new(60, 6, 30), "Dark stone grey")
+makeLabel(vault, "STORAGE VAULT", Color3.fromRGB(200, 200, 200),
+	UDim2.new(0, 180, 0, 40), Vector3.new(0, 10, 0))
+
+-- ── Dungeon doors (4 total: 3 Zone 1 + Capstone) ─────────────────────────────
+
+local doorData = {
+	{ x = -60, dungeon = 1, open = true  },
+	{ x = -20, dungeon = 2, open = false },
+	{ x =  20, dungeon = 3, open = false },
+	{ x =  60, dungeon = 4, open = false },  -- Capstone
+}
+
+for _, dd in ipairs(doorData) do
+	local dungeon = DungeonData.Dungeons[dd.dungeon]
+	local doorColor = dd.open and "Bright green" or "Dark grey"
+
+	local door = makePart("DungeonDoor_" .. dd.dungeon,
+		Vector3.new(10, 14, 2),
+		Vector3.new(dd.x, 7, -50),
+		doorColor)
+
+	-- Name label
+	local bg = Instance.new("BillboardGui")
+	bg.Size        = UDim2.new(0, 240, 0, 72)
+	bg.StudsOffset = Vector3.new(0, 11, 0)
+	bg.AlwaysOnTop = false
+	bg.Parent      = door
+
+	local nameLbl = Instance.new("TextLabel")
+	nameLbl.Size              = UDim2.new(1, 0, 0.56, 0)
+	nameLbl.BackgroundTransparency = 1
+	nameLbl.Text              = dungeon and dungeon.name or ("Dungeon " .. dd.dungeon)
+	nameLbl.TextColor3        = Color3.new(1, 1, 1)
+	nameLbl.TextScaled        = true
+	nameLbl.Font              = Enum.Font.GothamBold
+	nameLbl.Parent            = bg
+
+	local subLbl = Instance.new("TextLabel")
+	subLbl.Size              = UDim2.new(1, 0, 0.38, 0)
+	subLbl.Position          = UDim2.new(0, 0, 0.58, 0)
+	subLbl.BackgroundTransparency = 1
+	subLbl.Text              = dd.open
+		and "ENTER (Lv " .. (dungeon and dungeon.minLevel or 1) .. "+)"
+		or  "LOCKED — Req. Level " .. (dungeon and dungeon.minLevel or "?")
+	subLbl.TextColor3        = dd.open
+		and Color3.fromRGB(140, 255, 140)
+		or  Color3.fromRGB(160, 160, 160)
+	subLbl.TextScaled        = true
+	subLbl.Font              = Enum.Font.Gotham
+	subLbl.Parent            = bg
+
+	-- ProximityPrompt on open doors only (locked doors use DungeonManager level check)
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.ActionText            = "Enter Dungeon"
+	prompt.ObjectText            = dungeon and dungeon.name or ("Dungeon " .. dd.dungeon)
+	prompt.HoldDuration          = 0
+	prompt.MaxActivationDistance = 14
+	prompt.Parent                = door
+	-- DungeonManager enforces the level gate server-side; all 4 have prompts
+end
+
+-- ── Zone 1 dungeon room (shared for Phase 1 — at Z = 1000) ───────────────────
+
+local D1_CENTER = Vector3.new(0, 0, 1000)
+
+-- Floor
 local d1Floor = Instance.new("Part")
-d1Floor.Name = "Dungeon1Floor"
-d1Floor.Size = Vector3.new(100, 4, 100)
-d1Floor.Position = d1Center + Vector3.new(0, -2, 0)
+d1Floor.Name     = "Dungeon1Floor"
+d1Floor.Size     = Vector3.new(120, 4, 120)
+d1Floor.Position = D1_CENTER + Vector3.new(0, -2, 0)
 d1Floor.Anchored = true
 d1Floor.Material = Enum.Material.SmoothPlastic
 d1Floor.BrickColor = BrickColor.new("Dark grey")
-d1Floor.Parent = Workspace
+d1Floor.Parent   = Workspace
 
--- Walls (N/S/E/W)
-local wallDefs = {
-	{ pos = Vector3.new(0, 10, -52),  size = Vector3.new(104, 28, 4) },
-	{ pos = Vector3.new(0, 10, 52),   size = Vector3.new(104, 28, 4) },
-	{ pos = Vector3.new(-52, 10, 0),  size = Vector3.new(4, 28, 100) },
-	{ pos = Vector3.new(52, 10, 0),   size = Vector3.new(4, 28, 100) },
+-- Walls
+local walls = {
+	{ Vector3.new(0, 14, -62),  Vector3.new(124, 32, 4) },   -- N
+	{ Vector3.new(0, 14, 62),   Vector3.new(124, 32, 4) },   -- S
+	{ Vector3.new(-62, 14, 0),  Vector3.new(4, 32, 120) },   -- W
+	{ Vector3.new(62, 14, 0),   Vector3.new(4, 32, 120) },   -- E
 }
-for _, w in ipairs(wallDefs) do
+for _, w in ipairs(walls) do
 	local wall = Instance.new("Part")
-	wall.Size = w.size
-	wall.Position = d1Center + w.pos
-	wall.Anchored = true
-	wall.Material = Enum.Material.SmoothPlastic
+	wall.Size      = w[2]
+	wall.Position  = D1_CENTER + w[1]
+	wall.Anchored  = true
+	wall.Material  = Enum.Material.SmoothPlastic
 	wall.BrickColor = BrickColor.new("Dark stone grey")
-	wall.Parent = Workspace
+	wall.Parent    = Workspace
 end
 
--- Dungeon 1 label on ceiling/sign area
-local d1Sign = Instance.new("Part")
-d1Sign.Name = "Dungeon1Sign"
-d1Sign.Size = Vector3.new(30, 6, 1)
-d1Sign.Position = d1Center + Vector3.new(0, 20, -51)
-d1Sign.Anchored = true
-d1Sign.BrickColor = BrickColor.new("Bright green")
-d1Sign.Parent = Workspace
-
+-- Entry sign (south wall)
+local entranceSign = makePart("EntranceSign", Vector3.new(30, 6, 1),
+	D1_CENTER + Vector3.new(0, 18, 61), "Bright green")
 local signGui = Instance.new("SurfaceGui")
-signGui.Face = Enum.NormalId.Front
-signGui.Parent = d1Sign
+signGui.Face  = Enum.NormalId.Front
+signGui.Parent = entranceSign
+local signLbl = Instance.new("TextLabel")
+signLbl.Size   = UDim2.new(1, 0, 1, 0)
+signLbl.BackgroundTransparency = 1
+signLbl.Text   = "ZONE 1 — THE BLIGHTED REACHES"
+signLbl.TextColor3 = Color3.new(1, 1, 1)
+signLbl.TextScaled = true
+signLbl.Font   = Enum.Font.GothamBold
+signLbl.Parent = signGui
 
-local signLabel = Instance.new("TextLabel")
-signLabel.Size = UDim2.new(1, 0, 1, 0)
-signLabel.BackgroundTransparency = 1
-signLabel.Text = "DUNGEON 1 — BEGINNER"
-signLabel.TextColor3 = Color3.new(1, 1, 1)
-signLabel.TextScaled = true
-signLabel.Font = Enum.Font.GothamBold
-signLabel.Parent = signGui
-
-print("[WorldBuilder] Hub and Dungeon 1 room built")
+print("[WorldBuilder] Hub and dungeon room built")
